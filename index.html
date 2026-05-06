@@ -1,0 +1,394 @@
+<!-- =========================
+FILE: index.html
+========================= -->
+
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>
+THU CHI HỘ KINH DOANH ÚT NHUNG
+</title>
+
+<!-- HANDSONTABLE -->
+<link rel="stylesheet"
+href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css">
+
+<!-- CSS -->
+<link rel="stylesheet"
+href="style.css">
+
+<!-- HANDSONTABLE -->
+<script src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js"></script>
+
+<!-- CHART -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- XLSX -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<!-- PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+</head>
+
+<body>
+
+<!-- =========================
+HEADER
+========================= -->
+
+<header class="hero">
+
+  <div class="hero-overlay"></div>
+
+  <div class="hero-content">
+
+    <h1>
+      THU CHI HỘ KINH DOANH CÁ NHÂN ÚT NHUNG
+    </h1>
+
+    <p>
+      HỘ KINH DOANH PHÂN PHỐI & BÁN LẺ THỰC PHẨM
+    </p>
+
+  </div>
+
+</header>
+
+<!-- =========================
+MENU
+========================= -->
+
+<nav class="menu">
+
+  <button onclick="showTab('dashboard')">
+    Dashboard
+  </button>
+
+  <button onclick="showTab('ledger')">
+    Sổ S2a-HKD
+  </button>
+
+  <button onclick="showTab('invoice')">
+    Hóa đơn đỏ
+  </button>
+
+  <button onclick="showTab('tax')">
+    Thuế
+  </button>
+
+  <button onclick="showTab('report')">
+    Sao kê
+  </button>
+
+</nav>
+
+<div class="container">
+
+<!-- =========================
+DASHBOARD
+========================= -->
+
+<section id="dashboardTab"
+         class="tab">
+
+  <h2>
+    TỔNG QUAN DOANH THU
+  </h2>
+
+  <div class="cards">
+
+    <div class="card">
+
+      <h3>
+        Tổng doanh thu
+      </h3>
+
+      <p id="dashboardRevenue">
+        0 đ
+      </p>
+
+    </div>
+
+    <div class="card">
+
+      <h3>
+        Thuế GTGT
+      </h3>
+
+      <p id="dashboardVAT">
+        0 đ
+      </p>
+
+    </div>
+
+    <div class="card">
+
+      <h3>
+        Thuế TNCN
+      </h3>
+
+      <p id="dashboardPIT">
+        0 đ
+      </p>
+
+    </div>
+
+  </div>
+
+  <canvas id="chart"></canvas>
+
+</section>
+
+<!-- =========================
+LEDGER
+========================= -->
+
+<section id="ledgerTab"
+         class="tab hidden">
+
+  <div class="toolbar">
+
+    <button onclick="saveData()">
+      Lưu dữ liệu
+    </button>
+
+    <button onclick="addSheet()">
+      + Trang mới
+    </button>
+
+    <button onclick="printLedger()">
+      In trang
+    </button>
+
+    <button onclick="exportExcel()">
+      Xuất Excel
+    </button>
+
+    <button onclick="exportPDF()">
+      Xuất PDF
+    </button>
+
+  </div>
+
+  <!-- SHEET TABS -->
+
+  <div id="sheetTabs"
+       class="sheet-tabs">
+
+  </div>
+
+  <!-- SPREADSHEET -->
+
+  <div class="sheet-wrapper">
+
+    <div id="spreadsheet"></div>
+
+  </div>
+
+  <!-- TOTAL -->
+
+  <div class="totals">
+
+    <div>
+
+      <strong>
+        Tổng cộng:
+      </strong>
+
+      <span id="totalRevenue">
+        0 đ
+      </span>
+
+    </div>
+
+    <div>
+
+      <strong>
+        Thuế GTGT:
+      </strong>
+
+      <span id="vatTax">
+        0 đ
+      </span>
+
+    </div>
+
+    <div>
+
+      <strong>
+        Thuế TNCN:
+      </strong>
+
+      <span id="pitTax">
+        0 đ
+      </span>
+
+    </div>
+
+  </div>
+
+</section>
+
+<!-- =========================
+INVOICE
+========================= -->
+
+<section id="invoiceTab"
+         class="tab hidden">
+
+  <h2>
+    HÓA ĐƠN ĐỎ
+  </h2>
+
+  <div class="invoice-grid">
+
+    <input type="text"
+           id="customer"
+           placeholder="Tên khách hàng">
+
+    <input type="text"
+           id="itemName"
+           placeholder="Tên hàng hóa">
+
+    <input type="number"
+           id="qty"
+           placeholder="Số lượng">
+
+    <input type="text"
+           id="price"
+           placeholder="Đơn giá">
+
+  </div>
+
+  <button onclick="addInvoiceItem()">
+    Thêm hàng hóa
+  </button>
+
+  <table class="invoice-table">
+
+    <thead>
+
+    <tr>
+
+      <th>Hàng hóa</th>
+      <th>SL</th>
+      <th>Đơn giá</th>
+      <th>Thành tiền</th>
+
+    </tr>
+
+    </thead>
+
+    <tbody id="invoiceBody">
+
+    </tbody>
+
+  </table>
+
+  <div class="invoice-total">
+
+    Tổng cộng:
+    <span id="invoiceTotal">
+      0 đ
+    </span>
+
+  </div>
+
+  <button onclick="printInvoice()">
+    In hóa đơn đỏ
+  </button>
+
+</section>
+
+<!-- =========================
+TAX
+========================= -->
+
+<section id="taxTab"
+         class="tab hidden">
+
+  <h2>
+    TÍNH THUẾ
+  </h2>
+
+  <div class="cards">
+
+    <div class="card">
+
+      <h3>
+        Doanh thu năm
+      </h3>
+
+      <p id="yearRevenue">
+        0 đ
+      </p>
+
+    </div>
+
+    <div class="card">
+
+      <h3>
+        Thuế môn bài
+      </h3>
+
+      <p id="licenseTax">
+        0 đ
+      </p>
+
+    </div>
+
+    <div class="card">
+
+      <h3>
+        Tổng thuế
+      </h3>
+
+      <p id="totalTax">
+        0 đ
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+
+<!-- =========================
+REPORT
+========================= -->
+
+<section id="reportTab"
+         class="tab hidden">
+
+  <h2>
+    SAO KÊ & BACKUP
+  </h2>
+
+  <div class="toolbar">
+
+    <button onclick="backupData()">
+      Backup JSON
+    </button>
+
+    <button onclick="clearAllData()">
+      Xóa dữ liệu
+    </button>
+
+  </div>
+
+</section>
+
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
